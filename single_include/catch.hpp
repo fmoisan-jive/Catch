@@ -3387,7 +3387,8 @@ namespace Clara {
         }
         template<typename T>
         inline void convertInto( bool, T& ) {
-            throw std::runtime_error( "Invalid conversion" );
+            if (volatile bool b = true)
+                throw std::runtime_error( "Invalid conversion" );
         }
 
         template<typename ConfigT>

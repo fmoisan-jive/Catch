@@ -11,6 +11,7 @@
 #include "catch_result_type.h"
 #include "catch_assertionresult.h"
 #include "catch_common.h"
+#include "catch_matchers.hpp"
 
 namespace Catch {
 
@@ -38,11 +39,12 @@ namespace Catch {
         ResultBuilder(  char const* macroName,
                         SourceLineInfo const& lineInfo,
                         char const* capturedExpression,
-                        ResultDisposition::Flags resultDisposition );
+                        ResultDisposition::Flags resultDisposition,
+                        char const* secondArg = "" );
 
         template<typename T>
-        ExpressionLhs<T const&> operator->* ( T const& operand );
-        ExpressionLhs<bool> operator->* ( bool value );
+        ExpressionLhs<T const&> operator <= ( T const& operand );
+        ExpressionLhs<bool> operator <= ( bool value );
 
         template<typename T>
         ResultBuilder& operator << ( T const& value ) {
@@ -67,6 +69,9 @@ namespace Catch {
         void useActiveException( ResultDisposition::Flags resultDisposition = ResultDisposition::Normal );
         void captureResult( ResultWas::OfType resultType );
         void captureExpression();
+        void captureExpectedException( std::string const& expectedMessage );
+        void captureExpectedException( Matchers::Impl::Matcher<std::string> const& matcher );
+        void handleResult( AssertionResult const& result );
         void react();
         bool shouldDebugBreak() const;
         bool allowThrows() const;
@@ -80,7 +85,7 @@ namespace Catch {
             std::string lhs, rhs, op;
         } m_exprComponents;
         CopyableStream m_stream;
-        
+
         bool m_shouldDebugBreak;
         bool m_shouldThrow;
     };
@@ -93,11 +98,11 @@ namespace Catch {
 namespace Catch {
 
     template<typename T>
-    inline ExpressionLhs<T const&> ResultBuilder::operator->* ( T const& operand ) {
+    inline ExpressionLhs<T const&> ResultBuilder::operator <= ( T const& operand ) {
         return ExpressionLhs<T const&>( *this, operand );
     }
 
-    inline ExpressionLhs<bool> ResultBuilder::operator->* ( bool value ) {
+    inline ExpressionLhs<bool> ResultBuilder::operator <= ( bool value ) {
         return ExpressionLhs<bool>( *this, value );
     }
 

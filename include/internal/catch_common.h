@@ -23,9 +23,24 @@
 
 namespace Catch {
 
+    struct IConfig;
+
+    struct CaseSensitive { enum Choice {
+        Yes,
+        No
+    }; };
+
     class NonCopyable {
-        NonCopyable( NonCopyable const& );
-        void operator = ( NonCopyable const& );
+#ifdef CATCH_CONFIG_CPP11_GENERATED_METHODS
+        NonCopyable( NonCopyable const& )              = delete;
+        NonCopyable( NonCopyable && )                  = delete;
+        NonCopyable& operator = ( NonCopyable const& ) = delete;
+        NonCopyable& operator = ( NonCopyable && )     = delete;
+#else
+        NonCopyable( NonCopyable const& info );
+        NonCopyable& operator = ( NonCopyable const& );
+#endif
+
     protected:
         NonCopyable() {}
         virtual ~NonCopyable();
@@ -63,6 +78,7 @@ namespace Catch {
     void toLowerInPlace( std::string& s );
     std::string toLower( std::string const& s );
     std::string trim( std::string const& str );
+    bool replaceInPlace( std::string& str, std::string const& replaceThis, std::string const& withThis );
 
     struct pluralise {
         pluralise( std::size_t count, std::string const& label );
@@ -78,13 +94,14 @@ namespace Catch {
         SourceLineInfo();
         SourceLineInfo( char const* _file, std::size_t _line );
         SourceLineInfo( SourceLineInfo const& other );
-#  ifdef CATCH_CPP11_OR_GREATER
+#  ifdef CATCH_CONFIG_CPP11_GENERATED_METHODS
         SourceLineInfo( SourceLineInfo && )                  = default;
         SourceLineInfo& operator = ( SourceLineInfo const& ) = default;
         SourceLineInfo& operator = ( SourceLineInfo && )     = default;
 #  endif
         bool empty() const;
         bool operator == ( SourceLineInfo const& other ) const;
+        bool operator < ( SourceLineInfo const& other ) const;
 
         std::string file;
         std::size_t line;
@@ -98,6 +115,9 @@ namespace Catch {
     inline bool alwaysFalse() { return false; }
 
     void throwLogicError( std::string const& message, SourceLineInfo const& locationInfo );
+
+    void seedRng( IConfig const& config );
+    unsigned int rngSeed();
 
     // Use this in variadic streaming macros to allow
     //    >> +StreamEndStop

@@ -17,7 +17,7 @@
 // NB. Any general catch headers included here must be included
 // in catch.hpp first to make sure they are included by the single
 // header for non obj-usage
-#include "internal/catch_test_case_info.h"
+#include "catch_test_case_info.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // This protocol is really only here for (self) documenting purposes, since
@@ -72,7 +72,7 @@ namespace Catch {
 
     inline size_t registerTestMethods() {
         size_t noTestMethods = 0;
-        int noClasses = objc_getClassList( NULL, 0 );
+        int noClasses = objc_getClassList( CATCH_NULL, 0 );
 
         Class* classes = (CATCH_UNSAFE_UNRETAINED Class *)malloc( sizeof(Class) * noClasses);
         objc_getClassList( classes, noClasses );

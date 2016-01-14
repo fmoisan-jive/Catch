@@ -15,7 +15,11 @@ namespace Catch {
 
 namespace Detail {
 
+    const std::string unprintableString = "{?}";
+
     namespace {
+        const int hexThreshold = 255;
+
         struct Endianness {
             enum Arch { Big, Little };
 
@@ -73,7 +77,7 @@ std::string toString( std::wstring const& value ) {
     s.reserve( value.size() );
     for(size_t i = 0; i < value.size(); ++i )
         s += value[i] <= 0xff ? static_cast<char>( value[i] ) : '?';
-    return toString( s );
+    return Catch::toString( s );
 }
 
 std::string toString( const char* const value ) {
@@ -97,20 +101,21 @@ std::string toString( wchar_t* const value )
 std::string toString( int value ) {
     std::ostringstream oss;
     oss << value;
+    if( value > Detail::hexThreshold )
+        oss << " (0x" << std::hex << value << ")";
     return oss.str();
 }
 
 std::string toString( unsigned long value ) {
     std::ostringstream oss;
-    if( value > 8192 )
-        oss << "0x" << std::hex << value;
-    else
-        oss << value;
+    oss << value;
+    if( value > Detail::hexThreshold )
+        oss << " (0x" << std::hex << value << ")";
     return oss.str();
 }
 
 std::string toString( unsigned int value ) {
-    return toString( static_cast<unsigned long>( value ) );
+    return Catch::toString( static_cast<unsigned long>( value ) );
 }
 
 template<typename T>
@@ -153,6 +158,23 @@ std::string toString( signed char value ) {
 std::string toString( unsigned char value ) {
     return toString( static_cast<char>( value ) );
 }
+
+#ifdef CATCH_CONFIG_CPP11_LONG_LONG
+std::string toString( long long value ) {
+    std::ostringstream oss;
+    oss << value;
+    if( value > Detail::hexThreshold )
+        oss << " (0x" << std::hex << value << ")";
+    return oss.str();
+}
+std::string toString( unsigned long long value ) {
+    std::ostringstream oss;
+    oss << value;
+    if( value > Detail::hexThreshold )
+        oss << " (0x" << std::hex << value << ")";
+    return oss.str();
+}
+#endif
 
 #ifdef CATCH_CONFIG_CPP11_NULLPTR
 std::string toString( std::nullptr_t ) {
